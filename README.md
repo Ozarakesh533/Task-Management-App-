@@ -1,116 +1,173 @@
-# TaskFlow — Team Task Manager
+# TaskFlow Management 📋
 
-A production-ready task management web app built with Firebase Auth, Supabase (PostgreSQL), and vanilla JS.
-
----
-
-## Features
-
-- Google login via Firebase Auth
-- Add, edit, delete tasks
-- Project / category grouping
-- Priority levels (High / Medium / Low)
-- Assign to / Assigned by fields
-- Due dates with overdue detection
-- Notes per task
-- Search across tasks, assignees, projects
-- Filter by: All / Pending / Done / Overdue
-- Filter by project
-- Progress bar (completion %)
-- Dark mode (persisted in localStorage)
-- Export all tasks to CSV
-- Fully responsive (mobile friendly)
+> Full-Stack Task Management System  
+> Built by **Rakesh Oza** | March 2026
 
 ---
 
-## File Structure
+## 🌐 Live Applications
 
-```
-task-manager/
-├── index.html          ← Main HTML, layout, modal
-├── css/
-│   └── style.css       ← All styles, dark mode, responsive
-├── js/
-│   ├── app.js          ← Firebase config, auth, shared utils
-│   ├── tasks.js        ← CRUD: add, edit, delete, mark done
-│   └── ui.js           ← Render table, stats, filters
-├── .gitignore
-└── README.md
-```
+| Version | App | Docs |
+|--------|-----|------|
+| V1 — Supabase | https://my-todo-app-4dc76.web.app | — |
+| V2 — Cloud Run | https://task-flow-management-2e519.web.app | https://task-flow-management-2e519.web.app/docs.html |
 
 ---
 
-## Setup
+## 🔗 Project Links
 
-### 1. Supabase — Add new columns
+### 🔹 Version 1 — Supabase + Firebase
 
-Your existing `todos` table needs two new columns. Run this SQL in your Supabase SQL editor:
+- **Live App**  
+  https://my-todo-app-4dc76.web.app  
 
-```sql
-ALTER TABLE todos ADD COLUMN IF NOT EXISTS project     TEXT;
-ALTER TABLE todos ADD COLUMN IF NOT EXISTS notes       TEXT;
-```
+- **Supabase Database**  
+  https://supabase.com/dashboard/project/bnbizwpwowtianfsftnh  
 
-### 2. Firebase
+- **Firebase Console**  
+  https://console.firebase.google.com/project/my-todo-app-4dc76  
 
-Your Firebase config is already set in `js/app.js`. No changes needed.
+- **GCP Console**  
+  https://console.cloud.google.com/home/dashboard?project=my-todo-app-4dc76  
 
-### 3. Run locally
+- **Looker Studio Dashboard**  
+  https://lookerstudio.google.com/reporting/950862ae-7c6b-4e43-ab95-5abd7ff3efb8  
 
-Just open `index.html` in a browser — no build step needed.
+---
 
-For a local dev server (optional):
+### 🔹 Version 2 — Cloud SQL + Cloud Run + Looker Studio
+
+- **Live App**  
+  https://task-flow-management-2e519.web.app  
+
+- **Documentation**  
+  https://task-flow-management-2e519.web.app/docs.html  
+
+- **Backend API (Cloud Run)**  
+  https://taskflow-api-280656063253.asia-south1.run.app  
+
+- **Looker Studio Dashboard**  
+  https://lookerstudio.google.com/reporting/950862ae-7c6b-4e43-ab95-5abd7ff3efb8  
+
+- **Firebase Console**  
+  https://console.firebase.google.com/project/task-flow-management-2e519/overview  
+
+- **Firebase Hosting**  
+  https://console.firebase.google.com/project/task-flow-management-2e519/hosting/sites  
+
+- **Firebase Authentication**  
+  https://console.firebase.google.com/project/task-flow-management-2e519/authentication/users  
+
+- **GCP Project Dashboard**  
+  https://console.cloud.google.com/home/dashboard?project=task-flow-management-2e519  
+
+- **Cloud SQL Instance**  
+  https://console.cloud.google.com/sql/instances/taskflow-db/overview?project=task-flow-management-2e519  
+
+- **Cloud Run Service**  
+  https://console.cloud.google.com/run/detail/asia-south1/taskflow-api/metrics?project=task-flow-management-2e519  
+
+- **GCP Billing**  
+  https://console.cloud.google.com/billing?project=task-flow-management-2e519  
+
+---
+
+## 📌 Overview
+
+TaskFlow is a **scalable task management system** showcasing the transition from a simple frontend-driven app to a **production-ready cloud architecture**.
+
+- 🔹 **V1** — Lightweight system using Supabase REST APIs  
+- 🔹 **V2** — Full-stack system with secure backend and scalable infrastructure  
+
+---
+
+## ⚡ V1 vs V2 Comparison
+
+| Feature | V1 — Supabase | V2 — Cloud Run |
+|--------|--------------|----------------|
+| Architecture | Frontend only | Full-stack |
+| Database | Supabase PostgreSQL | Cloud SQL PostgreSQL |
+| Backend | ❌ No backend | ✅ Node.js + Express |
+| Auth | Firebase Google | Firebase + JWT |
+| API | Supabase REST | Custom REST API |
+| Security | Basic | Advanced (JWT) |
+| Analytics | Limited | Looker Studio |
+| Cost | ₹0 / month | ~₹600–800 / month |
+| Status | ✅ Live | ✅ Live |
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | V1 | V2 |
+|------|----|----|
+| Hosting | Firebase | Firebase |
+| Auth | Firebase Google | Firebase Google |
+| Database | Supabase PostgreSQL | Cloud SQL PostgreSQL 18 |
+| Backend | — | Node.js + Express |
+| API | Supabase Auto REST | Custom REST (Cloud Run) |
+| Analytics | — | Looker Studio |
+
+---
+
+## ✨ Features
+
+- ✅ Google Sign-In authentication  
+- ✅ Add / Edit / Delete tasks  
+- ✅ Priority — High / Medium / Low  
+- ✅ Project grouping  
+- ✅ Assign tasks to team members  
+- ✅ Due dates + overdue detection  
+- ✅ Advanced search and filters  
+- ✅ Progress tracking (completion %)  
+- ✅ Dark mode UI  
+- ✅ Export tasks to CSV  
+- ✅ Looker Studio analytics dashboard  
+
+---
+
+## 🚀 Deployment
+
+### Frontend
 ```bash
-npx serve .
-```
-
----
-
-## Deploy to Firebase Hosting
-
-```bash
-# Install Firebase CLI (once)
-npm install -g firebase-tools
-
-# Login
-firebase login
-
-# Init hosting in this folder
-firebase init hosting
-# → Public directory: .  (current folder)
-# → Single-page app: No
-# → Overwrite index.html: No
-
-# Deploy
 firebase deploy --only hosting
 ```
 
-Your app will be live at: `https://YOUR-PROJECT-ID.web.app`
+### Backend (Cloud Run)
+```bash
+cd api
+
+gcloud builds submit --tag gcr.io/task-flow-management-2e519/taskflow-api
+
+gcloud run deploy taskflow-api \
+  --image gcr.io/task-flow-management-2e519/taskflow-api \
+  --region asia-south1 \
+  --platform managed \
+  --allow-unauthenticated
+```
 
 ---
 
-## Push to GitHub
+## 💻 GitHub Setup
 
 ```bash
-# In your project folder
 git init
 git add .
-git commit -m "Initial commit — TaskFlow"
+git commit -m "TaskFlow v1 & v2"
 
-# Create a new repo on github.com, then:
-git remote add origin https://github.com/YOUR_USERNAME/task-manager.git
-git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/task-management-system.git
 git push -u origin main
 ```
 
 ---
 
-## Tech Stack
+## 📬 Contact
 
-| Layer     | Technology                  |
-|-----------|-----------------------------|
-| Frontend  | HTML, CSS, Vanilla JS       |
-| Auth      | Firebase Authentication     |
-| Database  | Supabase (PostgreSQL)       |
-| Hosting   | Firebase Hosting            |
-| Fonts     | Plus Jakarta Sans, JetBrains Mono |
+**Rakesh Oza**  
+📧 ozarakesh533@gmail.com  
+🔗 https://www.linkedin.com/in/rakeshoza/  
+💻 https://github.com/Ozarakesh533  
+
+---
+
+⭐ *If you like this project, consider giving it a star!*
