@@ -3433,6 +3433,63 @@
       .ap-coming-soon-grid { grid-template-columns: 1fr; }
     }
 
+    /* ═══ ANALYTICS OVERVIEW CHARTS — flexible responsive grid ══════ */
+    @media (max-width: 1280px) {
+      .section-grid[style*="2fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Prevent ApexCharts from overflowing card boundaries */
+    .card .apexcharts-canvas,
+    .card-inner .apexcharts-canvas {
+      max-width: 100% !important;
+      overflow: visible !important;
+    }
+    .card-inner {
+      overflow: visible !important;
+      min-width: 0 !important;
+    }
+    /* Ensure chart boxes dont expand beyond parent */
+    .chart-box,
+    .chart-box-sm,
+    .chart-box-lg {
+      min-width: 0 !important;
+      overflow: visible !important;
+      box-sizing: border-box !important;
+    }
+    .apexcharts-svg foreignObject,
+    .apexcharts-inner {
+      overflow: visible !important;
+    }
+
+    /* ═══ SECTION DIVIDER LABEL for new chart groups ═══════════════ */
+    .analytics-section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #64748b;
+      margin-bottom: 6px;
+      margin-top: 4px;
+    }
+    .section-grid.grid-1,
+    .grid-1 {
+      grid-template-columns: 1fr !important;
+    }
+
+    .analytics-section-label::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      border-radius: 99px;
+      background: linear-gradient(180deg, #bd1874, #1d4ed8);
+    }
+
   </style>
 </head>
 
@@ -3770,6 +3827,119 @@
               </article>
             </div>
 
+            <div class="analytics-section-label"><span class="material-symbols-outlined" style="font-size:15px">analytics</span>Analytics Overview — Volume, Mix &amp; Exception Intelligence</div>
+            <!-- ═══ ANALYTICS OVERVIEW ROW (from Intelligence Dashboard) ═══ -->
+            <div class="section-grid mb-4" style="grid-template-columns:2fr 1fr;gap:10px;">
+              <!-- Workload vs Productivity: Allocation + Processed bars + Productivity % line -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">bar_chart</span>Allocation vs Processed vs Productivity %</div>
+                      <div class="section-subtitle">Region-level comparison of total allocated work, processed output and resulting productivity rate.</div>
+                    </div>
+                  </div>
+                  <div id="regionWorkloadProductivityChart" class="chart-box"></div>
+                </div>
+              </article>
+              <!-- Process Mix Donut -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">donut_large</span>Process Mix</div>
+                      <div class="section-subtitle">Work-status split: processed, pending, exceptions and parking across all selected regions.</div>
+                    </div>
+                  </div>
+                  <div id="regionStatusDonutChart" class="chart-box"></div>
+                </div>
+              </article>
+            </div>
+
+            <!-- ═══ PROCESS CONTRIBUTION ROW ═══ -->
+            <div class="section-grid grid-2 mb-4">
+              <!-- Process Contribution: BizCommon / CSR / Indexing / Processing breakdown -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">layers</span>Process Contribution by Region</div>
+                      <div class="section-subtitle">Allocated count breakdown by process type (BizCommon, CSR, Processing, Indexing, Parking) per region.</div>
+                    </div>
+                  </div>
+                  <div id="regionProcessContributionChart" class="chart-box"></div>
+                </div>
+              </article>
+              <!-- Exception Pareto -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">priority_high</span>Exception Pareto Analysis</div>
+                      <div class="section-subtitle">Top exception reasons ranked by frequency with cumulative impact line for 80/20 prioritization.</div>
+                    </div>
+                  </div>
+                  <div id="regionExceptionParetoChart" class="chart-box"></div>
+                </div>
+              </article>
+            </div>
+
+            <!-- ═══ PROCESS TYPE: ALLOCATED / COUNT / PROCESSED BREAKDOWN ═══ -->
+            <div class="section-grid grid-1 mb-4">
+              <article class="card magenta">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">view_column</span>Allocated vs Processed vs Pending — by Process Type (BizCommon / CSR / Indexing / Processing / Parking)</div>
+                      <div class="section-subtitle">Full allocation, processed count and pending volume for every process type across all selected regions. Identifies which work types carry the most load and backlog.</div>
+                    </div>
+                  </div>
+                  <div id="regionProcessSummaryChart" class="chart-box"></div>
+                </div>
+              </article>
+            </div>
+
+            <!-- ═══ PENDING / PARKING / COUNTRY ROW ═══ -->
+            <div class="section-grid grid-3 mb-4">
+              <!-- Pending Aging -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">hourglass_top</span>Pending Aging Buckets</div>
+                      <div class="section-subtitle">Age distribution of pending work from allocation time across all selected regions.</div>
+                    </div>
+                  </div>
+                  <div id="regionPendingAgingChart" class="chart-box-sm"></div>
+                </div>
+              </article>
+              <!-- Parking & Hold -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">pause_circle</span>Parking &amp; Hold Breakdown</div>
+                      <div class="section-subtitle">Blocked-work split by parking reason and hold category causing productivity loss.</div>
+                    </div>
+                  </div>
+                  <div id="regionParkingHoldChart" class="chart-box-sm"></div>
+                </div>
+              </article>
+              <!-- Country / Vendor Workload -->
+              <article class="card">
+                <div class="card-inner">
+                  <div class="section-title-row">
+                    <div class="section-title-block">
+                      <div class="section-title"><span class="material-symbols-outlined">public</span>Country / Office Workload</div>
+                      <div class="section-subtitle">Allocation volume by country or payment office to identify concentration risk.</div>
+                    </div>
+                  </div>
+                  <div id="regionVendorWorkloadChart" class="chart-box-sm"></div>
+                </div>
+              </article>
+            </div>
+
+            <!-- ═══ DAILY VOLUME + RANKING ROW (existing) ═══ -->
             <div class="section-grid grid-2 mb-4">
               <article class="card magenta">
                 <div class="card-inner"><div class="section-title-row"><div class="section-title-block"><div class="section-title"><span class="material-symbols-outlined">show_chart</span>Daily Work Volume Trend</div><div class="section-subtitle">User allocation, processed output and assigned pending movement across the selected period.</div></div></div><div id="regionDailyVolumeChart" class="chart-box"></div></div>
