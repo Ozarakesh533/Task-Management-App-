@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AP Processing — Productivity Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:         #0D0F14;
+  --bg2:        #12151C;
+  --surface:    #181C26;
+  --surface2:   #1E2330;
+  --surface3:   #242938;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.12);
+  --text:       #E8EAF0;
+  --text2:      #9BA3B8;
+  --text3:      #636A82;
+  --blue:       #4F8EF7;
+  --blue-dim:   rgba(79,142,247,0.15);
+  --teal:       #2DD4BF;
+  --teal-dim:   rgba(45,212,191,0.15);
+  --amber:      #F59E0B;
+  --amber-dim:  rgba(245,158,11,0.15);
+  --coral:      #F87171;
+  --coral-dim:  rgba(248,113,113,0.15);
+  --purple:     #A78BFA;
+  --purple-dim: rgba(167,139,250,0.15);
+  --green:      #4ADE80;
+  --green-dim:  rgba(74,222,128,0.15);
+  --red:        #F87171;
+  --accent:     #4F8EF7;
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font-body)}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:99px}
+
+/* ── LAYOUT ───────────────────────────────────────────────────────── */
+.app-shell{display:grid;grid-template-rows:auto auto 1fr;min-height:100vh}
+
+/* ── TOP HEADER ───────────────────────────────────────────────────── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.header-brand{display:flex;align-items:center;gap:12px}
+.brand-icon{
+  width:34px;height:34px;border-radius:var(--radius-md);
+  background:linear-gradient(135deg,#4F8EF7,#A78BFA);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#fff;flex-shrink:0;
+}
+.brand-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.2px}
+.brand-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.header-center{display:flex;align-items:center;gap:6px}
+.header-right{display:flex;align-items:center;gap:8px}
+
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;font-family:var(--font-mono);
+  padding:4px 10px;border-radius:99px;
+  border:1px solid var(--border2);
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.pill:hover{border-color:var(--accent);color:var(--text)}
+.pill.live{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:#4ADE80}
+.pulse-dot{
+  width:6px;height:6px;border-radius:50%;background:#4ADE80;
+  animation:pulse 2s infinite;flex-shrink:0
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+/* ── FILTER CONTROL BAR ───────────────────────────────────────────── */
+.filter-bar-main{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 28px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-right:2px}
+.filter-select{
+  font-size:12px;font-family:var(--font-body);
+  padding:5px 10px;border-radius:var(--radius-md);
+  border:1px solid var(--border2);
+  background:var(--surface);color:var(--text);
+  cursor:pointer;outline:none;
+  transition:border-color 0.15s;
+}
+.filter-select:focus{border-color:var(--accent)}
+.filter-chip{
+  font-size:12px;font-weight:500;padding:5px 12px;
+  border-radius:99px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.filter-chip.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.filter-chip:hover:not(.active){border-color:var(--border2);color:var(--text)}
+.filter-divider{width:1px;height:20px;background:var(--border);margin:0 4px}
+
+/* ── TABS ─────────────────────────────────────────────────────────── */
+.tabs-wrap{
+  display:flex;gap:0;padding:0 28px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+}
+.tab-btn{
+  padding:10px 20px;font-size:13px;font-weight:500;
+  font-family:var(--font-body);cursor:pointer;
+  border:none;background:none;color:var(--text3);
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all 0.15s;display:flex;align-items:center;gap:7px;
+}
+.tab-btn i{font-size:14px}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-btn:hover:not(.active){color:var(--text)}
+
+/* ── MAIN CONTENT ─────────────────────────────────────────────────── */
+.content{padding:24px 28px;overflow-y:auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── KPI STRIP ────────────────────────────────────────────────────── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px 18px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.2s,transform 0.15s;cursor:default;
+}
+.kpi-card::before{
+  content:'';position:absolute;inset:0;
+  background:var(--kpi-glow,transparent);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.kpi-card:hover::before{opacity:1}
+.kpi-icon{
+  width:30px;height:30px;border-radius:var(--radius-sm);
+  background:var(--kpi-color,var(--blue-dim));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--kpi-accent,var(--blue));
+  margin-bottom:12px;
+}
+.kpi-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.kpi-value{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--text);line-height:1;margin-bottom:8px}
+.kpi-delta{font-size:11px;font-weight:500;display:flex;align-items:center;gap:4px}
+.kpi-up{color:var(--green)}
+.kpi-down{color:var(--red)}
+.kpi-neutral{color:var(--text3)}
+.kpi-sparkline{margin-top:10px;height:30px}
+
+/* ── GRID LAYOUTS ─────────────────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-2-equal{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
+.col-span-2{grid-column:span 2}
+.mb16{margin-bottom:16px}
+
+/* ── CARD ─────────────────────────────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  transition:border-color 0.2s;
+}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{
+  font-size:12px;font-weight:600;color:var(--text2);
+  text-transform:uppercase;letter-spacing:0.06em;
+  display:flex;align-items:center;gap:7px;
+}
+.card-title i{font-size:14px;color:var(--text3)}
+.card-actions{display:flex;align-items:center;gap:6px}
+.card-badge{
+  font-size:10px;font-weight:500;font-family:var(--font-mono);
+  padding:3px 8px;border-radius:99px;
+  background:var(--surface2);color:var(--text3);
+  border:1px solid var(--border);
+}
+
+/* ── CHART WRAPPER ────────────────────────────────────────────────── */
+.chart-wrap{position:relative;width:100%}
+
+/* ── LEADERBOARD ──────────────────────────────────────────────────── */
+.lb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;border-bottom:1px solid var(--border);
+  transition:background 0.15s;
+}
+.lb-item:last-child{border-bottom:none}
+.lb-rank{
+  font-family:var(--font-mono);font-size:13px;font-weight:500;
+  color:var(--text3);width:22px;text-align:center;flex-shrink:0;
+}
+.lb-rank.gold{color:#F59E0B}
+.lb-rank.silver{color:#94A3B8}
+.lb-rank.bronze{color:#CD7C4B}
+.lb-avatar{
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;flex-shrink:0;
+  font-family:var(--font-display);
+}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:11px;color:var(--text3);margin-top:1px}
+.lb-bar-track{width:80px;height:4px;background:var(--surface3);border-radius:99px;flex-shrink:0}
+.lb-bar-fill{height:100%;border-radius:99px;transition:width 0.4s ease}
+.lb-count{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--text);min-width:42px;text-align:right}
+
+/* ── HEATMAP ──────────────────────────────────────────────────────── */
+.heatmap-container{overflow-x:auto}
+.heatmap-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:4px;min-width:480px}
+.hm-header{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;text-align:center;padding:4px 0}
+.hm-row-label{font-size:11px;color:var(--text2);display:flex;align-items:center;font-weight:500}
+.hm-cell{
+  height:32px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:500;font-family:var(--font-mono);
+  color:var(--text);cursor:default;transition:opacity 0.15s;
+  border:1px solid transparent;
+}
+.hm-cell:hover{border-color:rgba(255,255,255,0.2);opacity:1!important}
+
+/* ── PROGRESS BARS ────────────────────────────────────────────────── */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog-label{font-size:12px;color:var(--text2);width:86px;flex-shrink:0}
+.prog-track{flex:1;height:6px;background:var(--surface3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width 0.5s ease}
+.prog-pct{font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);width:38px;text-align:right}
+
+/* ── TABLE ────────────────────────────────────────────────────────── */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{
+  font-size:10px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.07em;
+  padding:8px 10px;border-bottom:1px solid var(--border);
+  text-align:left;
+}
+.data-table td{
+  font-size:12px;color:var(--text);
+  padding:8px 10px;border-bottom:1px solid var(--border);
+}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--surface2)}
+.status-pill{
+  font-size:10px;font-weight:600;padding:3px 9px;
+  border-radius:99px;font-family:var(--font-mono);
+}
+.status-on{background:rgba(74,222,128,0.12);color:#4ADE80;border:1px solid rgba(74,222,128,0.25)}
+.status-review{background:rgba(245,158,11,0.12);color:#F59E0B;border:1px solid rgba(245,158,11,0.25)}
+.status-lag{background:rgba(248,113,113,0.12);color:#F87171;border:1px solid rgba(248,113,113,0.25)}
+
+/* ── USER SELECT ──────────────────────────────────────────────────── */
+.user-select-wrap{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:14px 20px;background:var(--surface2);
+  border-radius:var(--radius-lg);border:1px solid var(--border);
+  margin-bottom:20px;
+}
+.user-select-wrap select{
+  font-size:13px;font-family:var(--font-body);
+  padding:7px 12px;border-radius:var(--radius-md);
+  border:1px solid var(--border2);background:var(--surface);
+  color:var(--text);outline:none;flex:1;max-width:280px;cursor:pointer;
+}
+.user-role-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:500;font-family:var(--font-mono);
+  padding:5px 11px;border-radius:99px;
+  background:var(--blue-dim);color:var(--blue);
+  border:1px solid rgba(79,142,247,0.25);
+}
+.region-tag{
+  font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);
+  background:var(--surface3);color:var(--text2);
+  font-family:var(--font-mono);
+}
+
+/* ── LEGEND ROW ───────────────────────────────────────────────────── */
+.legend-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── STAT BLOCK ───────────────────────────────────────────────────── */
+.stat-block{
+  display:flex;flex-direction:column;gap:4px;
+  padding:12px 14px;border-radius:var(--radius-md);
+  background:var(--surface2);border:1px solid var(--border);
+}
+.stat-block-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em}
+.stat-block-value{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text)}
+.stat-block-sub{font-size:11px;color:var(--text3)}
+
+/* ── SUB-FILTER ROW ───────────────────────────────────────────────── */
+.sub-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.sub-chip{
+  font-size:11px;font-weight:500;padding:4px 12px;
+  border-radius:99px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text3);
+  cursor:pointer;transition:all 0.15s;
+}
+.sub-chip.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.sub-chip:hover:not(.active){border-color:var(--border2);color:var(--text2)}
+
+/* ── SECTION LABEL ────────────────────────────────────────────────── */
+.section-head{
+  font-size:11px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.08em;
+  margin-bottom:12px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.section-head::before{
+  content:'';width:3px;height:14px;
+  background:linear-gradient(180deg,var(--blue),var(--purple));
+  border-radius:99px;
+}
+
+/* ── TREND INDICATOR ──────────────────────────────────────────────── */
+.trend-up{color:var(--green);display:inline-flex;align-items:center;gap:3px}
+.trend-down{color:var(--red);display:inline-flex;align-items:center;gap:3px}
+
+/* ── DONUT LEGEND CENTER ──────────────────────────────────────────── */
+.donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.donut-center{
+  position:absolute;text-align:center;pointer-events:none;
+}
+.donut-center-val{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text)}
+.donut-center-label{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ── SCROLLABLE TABLE WRAPPER ─────────────────────────────────────── */
+.table-scroll{overflow-x:auto;max-height:260px;overflow-y:auto}
+
+/* ── ANIMATIONS ───────────────────────────────────────────────────── */
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.anim-slide{animation:slideUp 0.3s ease both}
+
+/* ── RESPONSIVE TWEAKS ────────────────────────────────────────────── */
+@media(max-width:1100px){
+  .kpi-strip{grid-template-columns:repeat(3,1fr)}
+  .grid-2,.grid-3,.grid-2-equal,.grid-3-2{grid-template-columns:1fr}
+  .col-span-2{grid-column:span 1}
+}
+@media(max-width:700px){
+  .header,.filter-bar-main,.content{padding-left:16px;padding-right:16px}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .tabs-wrap{padding:0 16px}
+}
+
+/* ── SCORE RING ───────────────────────────────────────────────────── */
+.score-ring-wrap{display:flex;align-items:center;gap:16px}
+.score-ring{position:relative;width:80px;height:80px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-text{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.score-ring-val{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text)}
+.score-ring-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+
+/* ── COMPARISON BAR ───────────────────────────────────────────────── */
+.compare-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.compare-label{font-size:11px;color:var(--text2);width:72px;flex-shrink:0}
+.compare-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.compare-bar-user{height:4px;border-radius:99px;background:var(--blue);transition:width 0.5s}
+.compare-bar-avg{height:4px;border-radius:99px;background:var(--surface3);transition:width 0.5s}
+.compare-pct{font-size:11px;font-family:var(--font-mono);color:var(--text2);width:38px;text-align:right}
+
+/* ── WATERFALL MINI CHART ─────────────────────────────────────────── */
+.sparkbar{display:inline-flex;align-items:flex-end;gap:2px;height:30px}
+.sparkbar-col{width:4px;border-radius:2px 2px 0 0;background:var(--blue-dim);transition:height 0.3s}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-brand">
+    <div class="brand-icon"><i class="ti ti-file-invoice"></i></div>
+    <div>
+      <div class="brand-title">AP Processing — Productivity Intelligence</div>
+      <div class="brand-sub">Enterprise Dashboard &nbsp;·&nbsp; FY 2025–26 &nbsp;·&nbsp; All Regions</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="pill live"><span class="pulse-dot"></span>Live</div>
+    <div class="pill"><i class="ti ti-calendar" style="font-size:12px"></i>May 2026</div>
+    <div class="pill" id="refreshBtn" onclick="handleRefresh(this)" style="cursor:pointer"><i class="ti ti-refresh" style="font-size:12px"></i>Refresh</div>
+  </div>
+</header>
+
+<!-- ══ GLOBAL FILTER BAR ════════════════════════════════════════════ -->
+<div class="filter-bar-main" id="globalFilterBar">
+  <span class="filter-label">Region</span>
+  <div class="filter-group">
+    <div class="filter-chip active" data-filter="region" data-val="all" onclick="setGlobalFilter('region',this,'all')">All Regions</div>
+    <div class="filter-chip" data-filter="region" data-val="apac-s" onclick="setGlobalFilter('region',this,'apac-s')">APAC South</div>
+    <div class="filter-chip" data-filter="region" data-val="apac-n" onclick="setGlobalFilter('region',this,'apac-n')">APAC North</div>
+    <div class="filter-chip" data-filter="region" data-val="emea-w" onclick="setGlobalFilter('region',this,'emea-w')">EMEA West</div>
+    <div class="filter-chip" data-filter="region" data-val="emea-e" onclick="setGlobalFilter('region',this,'emea-e')">EMEA East</div>
+    <div class="filter-chip" data-filter="region" data-val="americas" onclick="setGlobalFilter('region',this,'americas')">Americas</div>
+  </div>
+  <div class="filter-divider"></div>
+  <span class="filter-label">Period</span>
+  <select class="filter-select" id="periodSelect" onchange="applyPeriodFilter(this.value)">
+    <option value="mtd">Month to Date</option>
+    <option value="qtd">Quarter to Date</option>
+    <option value="ytd">Year to Date</option>
+    <option value="l3m">Last 3 Months</option>
+    <option value="l6m" selected>Last 6 Months</option>
+  </select>
+  <div class="filter-divider"></div>
+  <span class="filter-label">Process</span>
+  <div class="filter-group">
+    <div class="filter-chip active" data-filter="process" data-val="all" onclick="setGlobalFilter('process',this,'all')">All Types</div>
+    <div class="filter-chip" data-filter="process" data-val="processed" onclick="setGlobalFilter('process',this,'processed')">Processed</div>
+    <div class="filter-chip" data-filter="process" data-val="bizcommon" onclick="setGlobalFilter('process',this,'bizcommon')">BizCommon</div>
+    <div class="filter-chip" data-filter="process" data-val="csr" onclick="setGlobalFilter('process',this,'csr')">CSR</div>
+    <div class="filter-chip" data-filter="process" data-val="exception" onclick="setGlobalFilter('process',this,'exception')">Exception</div>
+  </div>
+</div>
+
+<!-- ══ TABS ═════════════════════════════════════════════════════════ -->
+<div class="tabs-wrap">
+  <button class="tab-btn active" onclick="switchTab('regional')">
+    <i class="ti ti-map-2"></i>Regional Productivity
+  </button>
+  <button class="tab-btn" onclick="switchTab('individual')">
+    <i class="ti ti-user-circle"></i>Individual Productivity
+  </button>
+</div>
+
+<!-- ══ CONTENT ══════════════════════════════════════════════════════ -->
+<div class="content">
+
+<!-- ─── REGIONAL TAB ─────────────────────────────────────────── -->
+<div id="tab-regional" class="tab-panel active">
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card" style="--kpi-glow:radial-gradient(ellipse at top left,rgba(79,142,247,0.08),transparent 60%);--kpi-color:var(--blue-dim);--kpi-accent:var(--blue)">
+      <div class="kpi-icon"><i class="ti ti-file-stack"></i></div>
+      <div class="kpi-label">Total Processed</div>
+      <div class="kpi-value">142,830</div>
+      <div class="kpi-delta kpi-up"><i class="ti ti-trending-up" style="font-size:12px"></i>+8.4% vs last month</div>
+      <canvas class="kpi-sparkline" id="spark0"></canvas>
+    </div>
+    <div class="kpi-card" style="--kpi-glow:radial-gradient(ellipse at top left,rgba(45,212,191,0.08),transparent 60%);--kpi-color:var(--teal-dim);--kpi-accent:var(--teal)">
+      <div class="kpi-icon"><i class="ti ti-briefcase"></i></div>
+      <div class="kpi-label">BizCommon</div>
+      <div class="kpi-value">38,210</div>
+      <div class="kpi-delta kpi-up"><i class="ti ti-trending-up" style="font-size:12px"></i>+5.1%</div>
+      <canvas class="kpi-sparkline" id="spark1"></canvas>
+    </div>
+    <div class="kpi-card" style="--kpi-glow:radial-gradient(ellipse at top left,rgba(245,158,11,0.08),transparent 60%);--kpi-color:var(--amber-dim);--kpi-accent:var(--amber)">
+      <div class="kpi-icon"><i class="ti ti-headset"></i></div>
+      <div class="kpi-label">CSR Resolved</div>
+      <div class="kpi-value">24,650</div>
+      <div class="kpi-delta kpi-down"><i class="ti ti-trending-down" style="font-size:12px"></i>-2.3%</div>
+      <canvas class="kpi-sparkline" id="spark2"></canvas>
+    </div>
+    <div class="kpi-card" style="--kpi-glow:radial-gradient(ellipse at top left,rgba(74,222,128,0.08),transparent 60%);--kpi-color:var(--green-dim);--kpi-accent:var(--green)">
+      <div class="kpi-icon"><i class="ti ti-clock-hour-4"></i></div>
+      <div class="kpi-label">Avg Cycle Time</div>
+      <div class="kpi-value">1.8d</div>
+      <div class="kpi-delta kpi-up"><i class="ti ti-trending-up" style="font-size:12px"></i>-0.3d faster</div>
+      <canvas class="kpi-sparkline" id="spark3"></canvas>
+    </div>
+    <div class="kpi-card" style="--kpi-glow:radial-gradient(ellipse at top left,rgba(167,139,250,0.08),transparent 60%);--kpi-color:var(--purple-dim);--kpi-accent:var(--purple)">
+      <div class="kpi-icon"><i class="ti ti-shield-check"></i></div>
+      <div class="kpi-label">SLA Compliance</div>
+      <div class="kpi-value">96.4%</div>
+      <div class="kpi-delta kpi-up"><i class="ti ti-trending-up" style="font-size:12px"></i>+1.2%</div>
+      <canvas class="kpi-sparkline" id="spark4"></canvas>
+    </div>
+  </div>
+
+  <!-- Row 1: Region Bar + Donut + Monthly Trend -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:16px;margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-bar"></i>Volume by Region & Process Type</div>
+        <div class="card-badge" id="rBadge">All Regions</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Processed</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>BizCommon</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>CSR</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Exception</div>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="regionBar"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-donut"></i>Process Mix</div>
+      </div>
+      <div class="donut-wrap" style="height:170px">
+        <canvas id="processDoughnut" style="position:relative;z-index:1"></canvas>
+        <div class="donut-center">
+          <div class="donut-center-val">52%</div>
+          <div class="donut-center-label">Processed</div>
+        </div>
+      </div>
+      <div class="legend-row" style="margin-top:10px;margin-bottom:0;justify-content:center">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>52%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>27%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>17%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>4%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-line"></i>Monthly Trend</div>
+        <div class="card-badge">6M</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>APAC S</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>EMEA W</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Americas</div>
+      </div>
+      <div class="chart-wrap" style="height:185px">
+        <canvas id="trendLine"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Leaderboard + Heatmap -->
+  <div style="display:grid;grid-template-columns:1fr 1.8fr;gap:16px;margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-trophy"></i>Team Leaderboard</div>
+      </div>
+      <div class="sub-filter" id="lbFilterRow">
+        <div class="sub-chip active" onclick="setLbFilter(this,'all')">All</div>
+        <div class="sub-chip" onclick="setLbFilter(this,'processed')">Processed</div>
+        <div class="sub-chip" onclick="setLbFilter(this,'bizcommon')">BizCommon</div>
+        <div class="sub-chip" onclick="setLbFilter(this,'csr')">CSR</div>
+      </div>
+      <div id="leaderboard"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-grid-dots"></i>Region × Process Heatmap</div>
+        <div class="card-badge">Volume Intensity</div>
+      </div>
+      <div class="heatmap-container">
+        <div id="heatmap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: SLA Compliance + Exception Rate + Cycle Time Trend -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:16px;margin-bottom:0">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-shield-check"></i>SLA Compliance by Region</div>
+      </div>
+      <div id="slaProgress"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-alert-triangle"></i>Exception Rate Breakdown</div>
+      </div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="exceptionBar"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-clock"></i>Avg Cycle Time Trend</div>
+        <div class="card-badge">Days</div>
+      </div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="cycleTimeLine"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /tab-regional -->
+
+
+<!-- ─── INDIVIDUAL TAB ────────────────────────────────────────── -->
+<div id="tab-individual" class="tab-panel">
+
+  <!-- User selector -->
+  <div class="user-select-wrap">
+    <i class="ti ti-user-search" style="font-size:18px;color:var(--text3)"></i>
+    <select id="userSelect" onchange="loadUser(this.value)">
+      <option value="0">Priya Sharma</option>
+      <option value="1">Rahul Mehta</option>
+      <option value="2">Divya Nair</option>
+      <option value="3">Arjun Patel</option>
+      <option value="4">Sneha Reddy</option>
+    </select>
+    <div id="userRegionTag" class="region-tag">APAC South</div>
+    <div class="user-role-badge"><i class="ti ti-id-badge-2" style="font-size:12px"></i><span id="userRoleText">AP Processor</span></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <div class="filter-chip active" data-filter="uperiod" data-val="l6m" onclick="setGlobalFilter('uperiod',this,'l6m')">Last 6M</div>
+      <div class="filter-chip" data-filter="uperiod" data-val="l3m" onclick="setGlobalFilter('uperiod',this,'l3m')">Last 3M</div>
+      <div class="filter-chip" data-filter="uperiod" data-val="mtd" onclick="setGlobalFilter('uperiod',this,'mtd')">MTD</div>
+    </div>
+  </div>
+
+  <!-- User KPI Strip -->
+  <div class="kpi-strip" style="margin-bottom:20px">
+    <div class="kpi-card" style="--kpi-color:var(--blue-dim);--kpi-accent:var(--blue)">
+      <div class="kpi-icon"><i class="ti ti-file-stack"></i></div>
+      <div class="kpi-label">Total Invoices</div>
+      <div class="kpi-value" id="u-total">—</div>
+      <div class="kpi-delta" id="u-total-d"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--teal-dim);--kpi-accent:var(--teal)">
+      <div class="kpi-icon"><i class="ti ti-check"></i></div>
+      <div class="kpi-label">Processed</div>
+      <div class="kpi-value" id="u-proc">—</div>
+      <div class="kpi-delta" id="u-proc-d"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--amber-dim);--kpi-accent:var(--amber)">
+      <div class="kpi-icon"><i class="ti ti-briefcase"></i></div>
+      <div class="kpi-label">BizCommon</div>
+      <div class="kpi-value" id="u-biz">—</div>
+      <div class="kpi-delta" id="u-biz-d"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--coral-dim);--kpi-accent:var(--coral)">
+      <div class="kpi-icon"><i class="ti ti-headset"></i></div>
+      <div class="kpi-label">CSR</div>
+      <div class="kpi-value" id="u-csr">—</div>
+      <div class="kpi-delta" id="u-csr-d"></div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--purple-dim);--kpi-accent:var(--purple)">
+      <div class="kpi-icon"><i class="ti ti-target"></i></div>
+      <div class="kpi-label">Accuracy</div>
+      <div class="kpi-value" id="u-acc">—</div>
+      <div class="kpi-delta kpi-up" id="u-acc-d"></div>
+    </div>
+  </div>
+
+  <!-- Row 1: Daily Bar + Radar + Competency Ring -->
+  <div style="display:grid;grid-template-columns:1.4fr 1fr 0.8fr;gap:16px;margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-bar"></i>Weekly Process Breakdown</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Processed</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>BizCommon</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>CSR</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>Exception</div>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="userDailyBar"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-radar"></i>Competency Radar</div>
+      </div>
+      <div class="chart-wrap" style="height:215px">
+        <canvas id="userRadar"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card-header" style="margin-bottom:0">
+        <div class="card-title"><i class="ti ti-award"></i>Performance Score</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;flex:1">
+        <div>
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--surface3)" stroke-width="8"/>
+            <circle id="scoreRingCircle" cx="60" cy="60" r="50" fill="none" stroke="url(#ringGrad)" stroke-width="8"
+              stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="50"
+              transform="rotate(-90 60 60)"/>
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#4F8EF7"/>
+                <stop offset="100%" stop-color="#A78BFA"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div style="text-align:center;margin-top:-84px;position:relative;z-index:2">
+            <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--text)" id="scoreRingVal">97</div>
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Score</div>
+          </div>
+          <div style="height:84px"></div>
+        </div>
+      </div>
+      <div id="userQuickStats" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Process Allocation + Activity Log -->
+  <div style="display:grid;grid-template-columns:1fr 2.2fr;gap:16px;margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-layers-intersect"></i>Process Allocation</div>
+      </div>
+      <div id="processAlloc" style="margin-top:4px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-list-details"></i>Detailed Activity Log</div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Process Type</th>
+              <th>Allocated</th>
+              <th>Completed</th>
+              <th>Pending</th>
+              <th>Accuracy</th>
+              <th>Cycle Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="activityLog"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 3: Trend vs Avg + vs-team comparison -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-line"></i>6-Month Productivity Trend vs Team Average</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div><span id="trendUserLabel">User</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--surface3)"></div>Team Avg</div>
+      </div>
+      <div class="chart-wrap" style="height:190px">
+        <canvas id="userTrend"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-arrows-diff"></i>vs Team Benchmark</div>
+      </div>
+      <div id="benchmarkPanel" style="margin-top:8px"></div>
+    </div>
+
+  </div>
+
+</div><!-- /tab-individual -->
+
+</div><!-- /content -->
+</div><!-- /app-shell -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════ */
+const REGIONS = ['APAC S','APAC N','EMEA W','EMEA E','Americas'];
+const MONTHS  = ['Dec','Jan','Feb','Mar','Apr','May'];
+const C = {
+  blue:'#4F8EF7', teal:'#2DD4BF', amber:'#F59E0B',
+  coral:'#F87171', purple:'#A78BFA', green:'#4ADE80',
+  text2:'#9BA3B8', grid:'rgba(255,255,255,0.05)'
+};
+
+const regionData = {
+  processed: [18400,15200,22100,12800,19600],
+  bizcommon: [7200, 5800, 9100, 4600, 8300],
+  csr:       [4800, 3900, 6200, 3100, 5400],
+  exception: [1200,  980, 1500,  820, 1150],
+};
+
+const teams = [
+  {name:'APAC South', code:'AS', bg:'#1a2440', tc:C.blue,   all:30400, proc:18400, biz:7200, csr:4800, sla:97.2},
+  {name:'Americas',   code:'AM', bg:'#1a2d1a', tc:C.green,  all:27300, proc:16800, biz:6200, csr:4300, sla:96.1},
+  {name:'APAC North', code:'AN', bg:'#2a2218', tc:C.amber,  all:24900, proc:15200, biz:5800, csr:3900, sla:94.8},
+  {name:'EMEA West',  code:'EW', bg:'#182a26', tc:C.teal,   all:37400, proc:22100, biz:9100, csr:6200, sla:98.3},
+  {name:'EMEA East',  code:'EE', bg:'#281822', tc:C.coral,  all:20500, proc:12800, biz:4600, csr:3100, sla:93.5},
+];
+
+const users = [
+  {name:'Priya Sharma', region:'APAC South', role:'AP Processor',       total:3840, proc:2100, biz:980,  csr:580,  other:180, acc:97.2, delta:'+6.1%', radar:[92,88,95,84,90,87], score:94},
+  {name:'Rahul Mehta',  region:'APAC North', role:'Senior AP Analyst',  total:3210, proc:1750, biz:840,  csr:490,  other:130, acc:95.8, delta:'+3.8%', radar:[85,90,88,92,82,86], score:89},
+  {name:'Divya Nair',   region:'EMEA West',  role:'AP Team Lead',       total:4120, proc:2280, biz:1050, csr:620,  other:170, acc:98.1, delta:'+9.2%', radar:[96,91,97,89,94,93], score:97},
+  {name:'Arjun Patel',  region:'Americas',   role:'AP Processor',       total:3560, proc:1940, biz:920,  csr:540,  other:160, acc:96.4, delta:'+4.5%', radar:[88,86,90,95,88,84], score:92},
+  {name:'Sneha Reddy',  region:'APAC South', role:'Junior AP Analyst',  total:2980, proc:1620, biz:780,  csr:440,  other:140, acc:94.6, delta:'+1.9%', radar:[82,88,84,78,86,80], score:84},
+];
+
+const teamAvgRadar = [84,87,85,83,84,82];
+const cycleTimeData = {
+  'APAC S': [2.4,2.2,2.1,2.0,1.9,1.8],
+  'EMEA W': [2.1,2.0,1.9,1.8,1.7,1.6],
+  'Americas':[2.6,2.5,2.3,2.2,2.1,2.0],
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHART INSTANCES
+═══════════════════════════════════════════════════════════════════ */
+let charts = {};
+
+function destroyChart(id){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+}
+
+/* ── Chart.js defaults ───────────────────────────────────────────── */
+Chart.defaults.color = C.text2;
+Chart.defaults.borderColor = C.grid;
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+/* ═══════════════════════════════════════════════════════════════════
+   SPARKLINES
+═══════════════════════════════════════════════════════════════════ */
+function drawSparklines(){
+  const sparkData = [
+    [110,118,122,128,132,142],
+    [32,34,35,36,37,38],
+    [26,25,27,26,25,24],
+    [2.4,2.2,2.1,2.0,1.9,1.8],
+    [94,95,95,96,96,96],
+  ];
+  const sparkColors = [C.blue, C.teal, C.amber, C.green, C.purple];
+  sparkData.forEach((data, i) => {
+    const canvas = document.getElementById('spark'+i);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.offsetWidth || 140;
+    const h = 30;
+    canvas.width = w; canvas.height = h;
+    const mn = Math.min(...data), mx = Math.max(...data);
+    const pts = data.map((v,j)=>({x:j/(data.length-1)*w,y:h-(v-mn)/(mx-mn||1)*h*0.8-h*0.1}));
+    const grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0, sparkColors[i]+'44');
+    grad.addColorStop(1, sparkColors[i]+'00');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, h);
+    pts.forEach(p=>ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.beginPath();
+    pts.forEach((p,j)=>j===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle = sparkColors[i];
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+}
+setTimeout(drawSparklines, 50);
+
+/* ═══════════════════════════════════════════════════════════════════
+   REGIONAL CHARTS
+═══════════════════════════════════════════════════════════════════ */
+function initRegionalCharts(){
+  /* Region Bar */
+  destroyChart('regionBar');
+  charts.regionBar = new Chart(document.getElementById('regionBar'),{
+    type:'bar',
+    data:{
+      labels:REGIONS,
+      datasets:[
+        {label:'Processed', data:regionData.processed, backgroundColor:C.blue,   borderRadius:3},
+        {label:'BizCommon', data:regionData.bizcommon, backgroundColor:C.teal,   borderRadius:3},
+        {label:'CSR',       data:regionData.csr,       backgroundColor:C.amber,  borderRadius:3},
+        {label:'Exception', data:regionData.exception, backgroundColor:C.coral,  borderRadius:3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},
+        y:{stacked:true,grid:{color:C.grid},ticks:{font:{size:11},callback:v=>v>=1000?v/1000+'k':v}}
+      }
+    }
+  });
+
+  /* Process Doughnut */
+  destroyChart('processDoughnut');
+  charts.processDoughnut = new Chart(document.getElementById('processDoughnut'),{
+    type:'doughnut',
+    data:{
+      labels:['Processed','BizCommon','CSR','Other'],
+      datasets:[{
+        data:[52,27,17,4],
+        backgroundColor:[C.blue,C.teal,C.amber,C.coral],
+        borderWidth:0, borderRadius:3, hoverOffset:6
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false, cutout:'70%',
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  /* Trend Line */
+  destroyChart('trendLine');
+  const trendData = {
+    'APAC S':   [24200,25800,27100,28400,29200,30400],
+    'EMEA W':   [31200,32800,34100,35600,36400,37400],
+    'Americas': [23400,24200,25100,26300,26900,27300],
+  };
+  charts.trendLine = new Chart(document.getElementById('trendLine'),{
+    type:'line',
+    data:{
+      labels:MONTHS,
+      datasets:Object.entries(trendData).map(([name,data],i)=>({
+        label:name, data,
+        borderColor:[C.blue,C.teal,C.amber][i],
+        borderWidth:2, pointRadius:3,
+        pointBackgroundColor:[C.blue,C.teal,C.amber][i],
+        tension:0.4, fill:false
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{grid:{color:C.grid},ticks:{font:{size:11},callback:v=>v/1000+'k'}}
+      }
+    }
+  });
+
+  /* Exception Bar */
+  destroyChart('exceptionBar');
+  charts.exceptionBar = new Chart(document.getElementById('exceptionBar'),{
+    type:'bar',
+    data:{
+      labels:REGIONS,
+      datasets:[{
+        label:'Exception Rate %',
+        data:[3.9,3.2,4.1,3.6,4.8],
+        backgroundColor:[C.blue,C.teal,C.amber,C.coral,C.purple].map(c=>c+'99'),
+        borderRadius:4,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:C.grid},ticks:{font:{size:11},callback:v=>v+'%'}},
+        y:{grid:{display:false},ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  /* Cycle Time Line */
+  destroyChart('cycleTimeLine');
+  charts.cycleTimeLine = new Chart(document.getElementById('cycleTimeLine'),{
+    type:'line',
+    data:{
+      labels:MONTHS,
+      datasets:Object.entries(cycleTimeData).map(([name,data],i)=>({
+        label:name, data,
+        borderColor:[C.blue,C.teal,C.amber][i],
+        borderWidth:2, pointRadius:3,
+        pointBackgroundColor:[C.blue,C.teal,C.amber][i],
+        tension:0.4, fill:false,
+        borderDash: i>0?[4,3]:[]
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{
+        display:true,
+        position:'bottom',
+        labels:{font:{size:10},boxWidth:10,padding:10}
+      }},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{grid:{color:C.grid},ticks:{font:{size:11},callback:v=>v+'d'},min:1.4,max:2.8}
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEADERBOARD
+═══════════════════════════════════════════════════════════════════ */
+const lbKeys = {all:'all',processed:'proc',bizcommon:'biz',csr:'csr'};
+
+function renderLeaderboard(filter){
+  const key = filter==='all'?'all':lbKeys[filter]||'all';
+  const getVal = t => key==='all'?t.all:t[key]||0;
+  const sorted = [...teams].sort((a,b)=>getVal(b)-getVal(a));
+  const max = getVal(sorted[0]);
+  const rankClass = ['gold','silver','bronze'];
+  const rankSymbol = ['🥇','🥈','🥉'];
+  document.getElementById('leaderboard').innerHTML = sorted.map((t,i)=>{
+    const val = getVal(t);
+    const pct = Math.round(val/max*100);
+    return `<div class="lb-item">
+      <div class="lb-rank ${rankClass[i]||''}">${i<3?rankSymbol[i]:i+1}</div>
+      <div class="lb-avatar" style="background:${t.bg};color:${t.tc}">${t.code}</div>
+      <div class="lb-info">
+        <div class="lb-name">${t.name}</div>
+        <div class="lb-meta">${val.toLocaleString()} ${key==='all'?'total':key}</div>
+      </div>
+      <div class="lb-bar-track"><div class="lb-bar-fill" style="width:${pct}%;background:${t.tc}"></div></div>
+      <div class="lb-count">${(val/1000).toFixed(1)}k</div>
+    </div>`;
+  }).join('');
+}
+
+function setLbFilter(btn, f){
+  document.querySelectorAll('#lbFilterRow .sub-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeaderboard(f);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HEATMAP
+═══════════════════════════════════════════════════════════════════ */
+function renderHeatmap(){
+  const processes = ['Processed','BizCommon','CSR','Exception','Void'];
+  const vals = [
+    [18400,7200,4800,1200,600],
+    [15200,5800,3900,980, 420],
+    [22100,9100,6200,1500,740],
+    [12800,4600,3100,820, 360],
+    [19600,8300,5400,1150,580],
+  ];
+  const colors = [C.blue,C.teal,C.amber,C.coral,C.purple];
+  const maxV = Math.max(...vals.flat());
+
+  let html = `<div class="heatmap-grid">
+    <div></div>
+    ${processes.map(p=>`<div class="hm-header">${p}</div>`).join('')}`;
+
+  REGIONS.forEach((r,ri)=>{
+    html += `<div class="hm-row-label">${r}</div>`;
+    vals[ri].forEach((v,ci)=>{
+      const intensity = 0.15 + (v/maxV)*0.72;
+      const bg = hexToRgba(colors[ci], intensity);
+      html += `<div class="hm-cell" style="background:${bg};opacity:0.95">${(v/1000).toFixed(1)}k</div>`;
+    });
+  });
+  html += '</div>';
+  document.getElementById('heatmap').innerHTML = html;
+}
+
+function hexToRgba(hex, alpha){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SLA PROGRESS
+═══════════════════════════════════════════════════════════════════ */
+function renderSLA(){
+  const slaColors = [C.blue,C.green,C.amber,C.teal,C.coral];
+  document.getElementById('slaProgress').innerHTML = teams.map((t,i)=>`
+    <div class="prog-row">
+      <div class="prog-label" style="font-size:11px">${t.name.replace('APAC ','').replace('EMEA ','')}</div>
+      <div class="prog-track">
+        <div class="prog-fill" style="width:${t.sla}%;background:${slaColors[i]}"></div>
+      </div>
+      <div class="prog-pct">${t.sla}%</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INDIVIDUAL USER
+═══════════════════════════════════════════════════════════════════ */
+function loadUser(idx){
+  const u = users[parseInt(idx)];
+
+  /* KPIs */
+  document.getElementById('userRegionTag').textContent = u.region;
+  document.getElementById('userRoleText').textContent  = u.role;
+  document.getElementById('u-total').textContent = u.total.toLocaleString();
+  document.getElementById('u-total-d').innerHTML = `<i class="ti ti-trending-up" style="font-size:12px"></i>${u.delta} vs last month`;
+  document.getElementById('u-total-d').className = 'kpi-delta kpi-up';
+  document.getElementById('u-proc').textContent  = u.proc.toLocaleString();
+  document.getElementById('u-proc-d').innerHTML  = `<span style="font-size:11px;color:var(--text3)">${Math.round(u.proc/u.total*100)}% of total</span>`;
+  document.getElementById('u-biz').textContent   = u.biz.toLocaleString();
+  document.getElementById('u-biz-d').innerHTML   = `<span style="font-size:11px;color:var(--text3)">${Math.round(u.biz/u.total*100)}% of total</span>`;
+  document.getElementById('u-csr').textContent   = u.csr.toLocaleString();
+  document.getElementById('u-csr-d').innerHTML   = `<span style="font-size:11px;color:var(--text3)">${Math.round(u.csr/u.total*100)}% of total</span>`;
+  document.getElementById('u-acc').textContent   = u.acc+'%';
+  document.getElementById('u-acc-d').innerHTML   = `<i class="ti ti-circle-check" style="font-size:12px"></i>Above target`;
+  document.getElementById('u-acc-d').className   = 'kpi-delta kpi-up';
+
+  /* Score ring */
+  const perim = 2*Math.PI*50;
+  const offset = perim * (1 - u.score/100);
+  document.getElementById('scoreRingCircle').setAttribute('stroke-dashoffset', offset.toFixed(1));
+  document.getElementById('scoreRingVal').textContent = u.score;
+
+  /* Quick stats */
+  document.getElementById('userQuickStats').innerHTML = [
+    {label:'SLA', val:u.acc+'%', color:C.green},
+    {label:'Rank', val:'#'+([3,4,1,2,5][parseInt(idx)]), color:C.amber},
+    {label:'Target', val:'105%', color:C.teal},
+  ].map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+    <span style="color:var(--text3)">${s.label}</span>
+    <span style="font-family:var(--font-mono);font-weight:500;color:${s.color}">${s.val}</span>
+  </div>`).join('');
+
+  /* Process Allocation */
+  const procTypes = [
+    {name:'Processed', val:u.proc,  color:C.blue,   pct:Math.round(u.proc/u.total*100)},
+    {name:'BizCommon', val:u.biz,   color:C.teal,   pct:Math.round(u.biz/u.total*100)},
+    {name:'CSR',       val:u.csr,   color:C.amber,  pct:Math.round(u.csr/u.total*100)},
+    {name:'Exception', val:u.other, color:C.coral,  pct:Math.round(u.other/u.total*100)},
+  ];
+  document.getElementById('processAlloc').innerHTML = procTypes.map(p=>`
+    <div class="prog-row">
+      <div class="prog-label"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:5px;vertical-align:1px"></span>${p.name}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${p.pct}%;background:${p.color}"></div></div>
+      <div class="prog-pct">${p.pct}%</div>
+    </div>`).join('');
+
+  /* Activity Log */
+  const cycleTimes = [1.7, 2.1, 1.5, 2.4];
+  document.getElementById('activityLog').innerHTML = procTypes.map((p,i)=>{
+    const done = Math.round(p.val*0.95-i*0.01*p.val);
+    const pend = p.val - done;
+    const statusHtml = p.pct>25
+      ? '<span class="status-pill status-on">On Track</span>'
+      : p.pct>10
+        ? '<span class="status-pill status-review">Review</span>'
+        : '<span class="status-pill status-lag">Lagging</span>';
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.name}</span></td>
+      <td style="font-family:var(--font-mono)">${p.val.toLocaleString()}</td>
+      <td style="font-family:var(--font-mono);color:var(--green)">${done.toLocaleString()}</td>
+      <td style="font-family:var(--font-mono);color:var(--amber)">${pend.toLocaleString()}</td>
+      <td style="font-family:var(--font-mono)">${u.acc}%</td>
+      <td style="font-family:var(--font-mono)">${cycleTimes[i]}d</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+
+  /* trendUserLabel */
+  document.getElementById('trendUserLabel').textContent = u.name.split(' ')[0];
+
+  /* Charts */
+  const weeks = ['W1','W2','W3','W4'];
+  const split = total => weeks.map((_,i)=>Math.round(total*[0.22,0.26,0.28,0.24][i]));
+
+  destroyChart('userDailyBar');
+  charts.userDailyBar = new Chart(document.getElementById('userDailyBar'),{
+    type:'bar',
+    data:{
+      labels:weeks,
+      datasets:[
+        {label:'Processed', data:split(u.proc),  backgroundColor:C.blue,  borderRadius:3},
+        {label:'BizCommon', data:split(u.biz),   backgroundColor:C.teal,  borderRadius:3},
+        {label:'CSR',       data:split(u.csr),   backgroundColor:C.amber, borderRadius:3},
+        {label:'Exception', data:split(u.other), backgroundColor:C.coral, borderRadius:3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},
+        y:{stacked:true,grid:{color:C.grid},ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  destroyChart('userRadar');
+  charts.userRadar = new Chart(document.getElementById('userRadar'),{
+    type:'radar',
+    data:{
+      labels:['Volume','Accuracy','Speed','BizCommon','CSR','Exception'],
+      datasets:[
+        {label:u.name.split(' ')[0], data:u.radar,
+          borderColor:C.blue, backgroundColor:C.blue+'22',
+          borderWidth:2, pointBackgroundColor:C.blue, pointRadius:3},
+        {label:'Team Avg', data:teamAvgRadar,
+          borderColor:C.text2, backgroundColor:'rgba(155,163,184,0.06)',
+          borderWidth:1.5, borderDash:[4,3],
+          pointBackgroundColor:C.text2, pointRadius:2}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        min:60,max:100,
+        ticks:{font:{size:9},stepSize:10,color:C.text2,backdropColor:'transparent'},
+        grid:{color:C.grid},
+        pointLabels:{font:{size:10},color:C.text2}
+      }}
+    }
+  });
+
+  const base = MONTHS.map((_,i)=>Math.round(u.total*(0.72+i*0.056)));
+  const avg  = base.map(v=>Math.round(v*0.84));
+
+  destroyChart('userTrend');
+  charts.userTrend = new Chart(document.getElementById('userTrend'),{
+    type:'line',
+    data:{
+      labels:MONTHS,
+      datasets:[
+        {label:u.name.split(' ')[0], data:base,
+          borderColor:C.blue, borderWidth:2, pointRadius:3,
+          pointBackgroundColor:C.blue, tension:0.4, fill:false},
+        {label:'Team Avg', data:avg,
+          borderColor:C.text2, borderWidth:1.5, borderDash:[5,4],
+          pointRadius:2, pointBackgroundColor:C.text2, tension:0.4, fill:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{grid:{color:C.grid},ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  /* Benchmark Panel */
+  const benchDims = ['Volume','Accuracy','Speed','BizCommon','CSR'];
+  const avgBench  = [84,87,85,83,84];
+  document.getElementById('benchmarkPanel').innerHTML = benchDims.map((d,i)=>{
+    const userVal = u.radar[i];
+    const avgVal  = avgBench[i];
+    const diff    = userVal - avgVal;
+    const diffHtml = diff>=0
+      ? `<span style="color:var(--green);font-size:10px;font-family:var(--font-mono)">+${diff}</span>`
+      : `<span style="color:var(--red);font-size:10px;font-family:var(--font-mono)">${diff}</span>`;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--text2)">${d}</span>
+        ${diffHtml}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px;color:var(--text3);width:32px">You</span>
+          <div style="flex:1;height:5px;background:var(--surface3);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${userVal}%;background:${C.blue};border-radius:99px;transition:width 0.5s"></div>
+          </div>
+          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text);width:24px;text-align:right">${userVal}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:9px;color:var(--text3);width:32px">Avg</span>
+          <div style="flex:1;height:5px;background:var(--surface3);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${avgVal}%;background:var(--surface3);border:1px solid rgba(155,163,184,0.3);border-radius:99px;box-sizing:border-box;transition:width 0.5s"></div>
+          </div>
+          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);width:24px;text-align:right">${avgVal}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLOBAL FILTERS
+═══════════════════════════════════════════════════════════════════ */
+function setGlobalFilter(group, btn, val){
+  document.querySelectorAll(`[data-filter="${group}"]`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(group==='region'){
+    document.getElementById('rBadge').textContent = val==='all'?'All Regions':btn.textContent;
+  }
+}
+
+function applyPeriodFilter(val){}
+
+function handleRefresh(btn){
+  btn.innerHTML = '<i class="ti ti-loader-2" style="font-size:12px;animation:spin 1s linear infinite"></i> Loading';
+  setTimeout(()=>{
+    btn.innerHTML = '<i class="ti ti-refresh" style="font-size:12px"></i>Refresh';
+  },1200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════════════════════════════════════════ */
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const btns = document.querySelectorAll('.tab-btn');
+  const idx  = tab==='regional'?0:1;
+  btns[idx].classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='regional'){initRegionalCharts();}
+  if(tab==='individual'){loadUser(document.getElementById('userSelect').value);}
+}
+
+/* spin animation */
+const style = document.createElement('style');
+style.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+renderLeaderboard('all');
+renderHeatmap();
+renderSLA();
+initRegionalCharts();
+</script>
+</body>
+</html>
