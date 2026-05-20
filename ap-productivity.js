@@ -77,7 +77,7 @@
 
   const COLORS = {
     magenta: "#bd1874",
-    navy: "#08245C",
+    navy: "#6366F1",
     blue: "#1D4ED8",
     brightBlue: "#2563EB",
     cyan: "#06B6D4",
@@ -1965,6 +1965,7 @@
     renderProductivityBandChart(kpiRows, users);
     renderAllocationBalanceChart(kpiRows, users);
     renderProcessContributionChart(kpiRows);
+    renderProcessSummaryByTypeChart(kpiRows);
     renderRegionHeatmap(kpiRows);
 
     // Detail-backed charts should never block the first Search render.
@@ -2884,6 +2885,71 @@
       noData: {
         text: "No process data"
       }
+    });
+  }
+
+  /**
+   * renderProcessSummaryByTypeChart — NEW
+   * Shows Allocated, Processed and Pending for each process type
+   * (BizCommon, CSR, Indexing, Processing, Parking) so managers
+   * can see the allocation / count / processed split at a glance.
+   */
+  function renderProcessSummaryByTypeChart(kpiRows) {
+    const ordered = ["Indexing", "Processing", "CSR", "BizCommon", "Parking"];
+    const processes = ordered.filter((p) =>
+      kpiRows.some((r) => r.process === p)
+    );
+
+    if (!processes.length) return;
+
+    const allocation = processes.map((p) =>
+      sum(kpiRows.filter((r) => r.process === p), "allocation")
+    );
+    const processed = processes.map((p) =>
+      sum(kpiRows.filter((r) => r.process === p), "processed")
+    );
+    const pending = processes.map((p) =>
+      sum(kpiRows.filter((r) => r.process === p), "pending")
+    );
+
+    const grandAlloc = allocation.reduce((a, b) => a + b, 0);
+    const grandProc  = processed.reduce((a, b) => a + b, 0);
+
+    renderChart("regionProcessSummaryChart", {
+      chart: { type: "bar", height: "100%", stacked: false, toolbar: { show: false } },
+      title: chartTotalTitle(
+        `Allocation: ${formatNumber(grandAlloc)} | Processed: ${formatNumber(grandProc)} | Rate: ${formatDecimal(pct(grandProc, grandAlloc), 1)}%`
+      ),
+      series: [
+        { name: "Allocated",  data: allocation },
+        { name: "Processed",  data: processed },
+        { name: "Pending",    data: pending }
+      ],
+      colors: [COLORS.blue, COLORS.green, COLORS.orange],
+      plotOptions: {
+        bar: {
+          borderRadius: 5,
+          columnWidth: "58%",
+          dataLabels: { position: "top" }
+        }
+      },
+      xaxis: {
+        categories: processes,
+        labels: { style: { fontSize: "11px", fontWeight: 800 } }
+      },
+      yaxis: {
+        labels: { formatter: (value) => shortNumber(value) }
+      },
+      dataLabels: {
+        enabled: true,
+        offsetY: -5,
+        style: { fontSize: "9px", fontWeight: 900 },
+        formatter(value) { return value ? shortNumber(value) : ""; }
+      },
+      legend: { position: "top", horizontalAlign: "left" },
+      grid: { borderColor: "#e5e7eb", padding: { top: 28, right: 18, bottom: 12, left: 10 } },
+      tooltip: { y: { formatter: (value) => formatNumber(value) } },
+      noData: { text: "No process data available" }
     });
   }
 
